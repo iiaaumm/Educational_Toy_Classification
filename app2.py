@@ -1,8 +1,3 @@
-
-### 2. Modify `app.py` to Load the Model from the Shareable Link
-
-
-
 import streamlit as st
 import numpy as np
 import tensorflow as tf
@@ -10,18 +5,33 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import requests
-from io import BytesIO
+import os
 
 # URL to the model file on Google Drive
 model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
+model_path = './saved_model/Toy_classification_10class.h5'
 
-# Function to download and load the model
-@st.cache(allow_output_mutation=True)
-def load_saved_model(model_url):
-    response = requests.get(model_url)
-    model_file = BytesIO(response.content)
-    model = load_model(model_file)
-    return model
+# Function to download the model from Google Drive
+def download_model_from_drive(url, destination):
+    try:
+        st.write("Downloading model... this may take a moment.")
+        response = requests.get(url)
+        with open(destination, 'wb') as f:
+            f.write(response.content)
+        st.write("Model downloaded successfully!")
+        return True
+    except Exception as e:
+        st.error(f"Error downloading the model: {e}")
+        return False
+
+# Function to load the model
+def load_saved_model(model_path):
+    try:
+        model = load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading the model: {e}")
+        return None
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
@@ -38,9 +48,17 @@ def preprocess_image(img):
 # Streamlit app
 st.title("Educational Toy Classification")
 
-# Load the model
-model = load_saved_model(model_url)
+# Ensure the model file exists
+if not os.path.exists(model_path):
+    download_success = download_model_from_drive(model_url, model_path)
+    if not download_success:
+        st.error("Failed to download the model. Please check the logs for details.")
+        st.stop()
 
+# Load the model
+model = load_saved_model(model_path)
+
+# Main app logic
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -71,4 +89,4 @@ if uploaded_file is not None:
             st.warning("Model not loaded. Please check the logs for details.")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"An error occurred during inference: {e}")
