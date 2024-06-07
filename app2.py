@@ -52,19 +52,14 @@ def preprocess_image(img):
 # Streamlit app
 st.title("Educational Toy Classification")
 
-# Ensure the model file exists
-if not os.path.exists(model_path):
-    download_success = download_model_from_drive(model_url, model_path)
-    if not download_success:
-        st.error("Failed to download the model. Please check the logs for details.")
-        st.stop()
+# File uploader
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 # Load the model
+model_path = './saved_model/Toy_classification_10class.h5'
 model = load_saved_model(model_path)
 
 # Main app logic
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
 if uploaded_file is not None:
     try:
         # Display the uploaded image
@@ -77,7 +72,7 @@ if uploaded_file is not None:
 
             # Perform inference to obtain predictions
             predictions = model.predict(img_array)
-            
+
             # Get the predicted class label
             predicted_class_index = np.argmax(predictions)
             predicted_class_label = class_labels[predicted_class_index]
