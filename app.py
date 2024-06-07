@@ -6,8 +6,8 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 
 # Load the saved model
-model_path = ('D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5')
 
+model_path = 'D:/STUDY/Year4/Development_Toy-A-10class/saved_model/Toy_classification_10class.h5'
 
 
 # List of class labels
