@@ -8,7 +8,7 @@ import requests
 import os
 
 # URL to the model file on Google Drive
-model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
+model_url = 'https://drive.google.com/drive/folders/1SqEm0VQ0Yp5Wqxqxb0-W7N1Kksa2O3LA?usp=sharing'
 model_path = './saved_model/Toy_classification_10class.h5'
 
 # Ensure the saved_model directory exists
