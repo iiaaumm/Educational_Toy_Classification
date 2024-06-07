@@ -3,9 +3,8 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import requests
+import gdown
 import os
-import gdown  # Import gdown for downloading from Google Drive
 
 # Direct download link to the model file on Google Drive
 model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
@@ -31,6 +30,7 @@ def load_saved_model(model_path):
     try:
         model = load_model(model_path)
         return model
+
     except Exception as e:
         st.error(f"Error loading the model: {e}")
         return None
