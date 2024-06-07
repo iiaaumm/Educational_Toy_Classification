@@ -2,7 +2,7 @@
 ### 2. Modify `app.py` to Load the Model from the Shareable Link
 
 
-```python
+
 import streamlit as st
 import numpy as np
 import tensorflow as tf
