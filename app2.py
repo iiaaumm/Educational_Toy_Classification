@@ -17,12 +17,27 @@ os.makedirs('./saved_model', exist_ok=True)
 # Function to download the model from Google Drive
 def download_model_from_drive(url, destination):
     try:
-        st.write("Downloading model... this may take a moment.")
-        response = requests.get(url)
+        session = requests.Session()
+        response = session.get(url, stream=True)
+        token = None
+
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                token = value
+                break
+
+        if token:
+            params = {'id': model_id, 'confirm': token}
+            response = session.get(url, params=params, stream=True)
+
         with open(destination, 'wb') as f:
-            f.write(response.content)
+            for chunk in response.iter_content(chunk_size=1024 * 1024):
+                if chunk:
+                    f.write(chunk)
+        
         st.write("Model downloaded successfully!")
         return True
+
     except Exception as e:
         st.error(f"Error downloading the model: {e}")
         return False
