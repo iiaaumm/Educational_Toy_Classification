@@ -3,8 +3,9 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import gdown
+import requests
 import os
+import gdown
 
 # Direct download link to the model file on Google Drive
 model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
@@ -26,6 +27,7 @@ def download_model_from_drive(url, destination):
         return False
 
 # Function to load the model
+@st.cache(allow_output_mutation=True)
 def load_saved_model(model_path):
     try:
         model = load_model(model_path)
