@@ -1,14 +1,13 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import requests
 import os
 
-# URL to the model file on Google Drive
-model_url = 'https://drive.google.com/drive/folders/1SqEm0VQ0Yp5Wqxqxb0-W7N1Kksa2O3LA?usp=sharing'
+# Direct download link to the model file on Google Drive
+model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
 model_path = './saved_model/Toy_classification_10class.h5'
 
 # Ensure the saved_model directory exists
@@ -27,7 +26,7 @@ def download_model_from_drive(url, destination):
                 break
 
         if token:
-            params = {'id': model_id, 'confirm': token}
+            params = {'id': url.split('=')[-1], 'confirm': token}
             response = session.get(url, params=params, stream=True)
 
         with open(destination, 'wb') as f:
