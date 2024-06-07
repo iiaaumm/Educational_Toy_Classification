@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 
 # Path to the model file on your local computer
-model_path = r'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5'
+model_path = r'D:/STUDY/Year4/Development_Toy-A-10class/saved_model/Toy_classification_10class.h5'
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
