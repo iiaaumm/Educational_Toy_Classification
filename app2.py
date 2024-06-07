@@ -3,8 +3,9 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import gdown
+import requests
 import os
+import gdown  # Import gdown for downloading from Google Drive
 
 # Direct download link to the model file on Google Drive
 model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
