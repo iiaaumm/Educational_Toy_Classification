@@ -4,7 +4,8 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 
-model_path = 'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_MobileNet.h5'
+# Path to the model file on your local computer
+model_path = r'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5'
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
@@ -12,7 +13,6 @@ def load_saved_model(model_path):
     try:
         model = load_model(model_path)
         return model
-
     except Exception as e:
         st.error(f"Error loading the model: {e}")
         return None
