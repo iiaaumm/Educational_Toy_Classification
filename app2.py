@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 
-model_path = 'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\'
+model_path = 'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_MobileNet.h5'
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
