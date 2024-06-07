@@ -1,7 +1,6 @@
 
 ### 2. Modify `app.py` to Load the Model from the Shareable Link
 
-Modify your `app.py` to load the model from the shareable link. Replace `'https://drive.google.com/file/d/17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU/view?usp=sharing'` with the actual shareable link to your model file on Google Drive.
 
 ```python
 import streamlit as st
