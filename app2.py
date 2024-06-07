@@ -3,27 +3,9 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import gdown
-import os
 
-# Direct download link to the model file on Google Drive
-model_url = 'https://drive.google.com/uc?id=17E3I-KAnE31C7FijmpaW8XdJ4DCFIVlU'
-model_path = './saved_model/Toy_classification_10class.h5'
-
-# Ensure the saved_model directory exists
-os.makedirs('./saved_model', exist_ok=True)
-
-# Function to download the model from Google Drive
-def download_model_from_drive(url, destination):
-    try:
-        st.write("Downloading model... this may take a moment.")
-        gdown.download(url, destination, quiet=False)
-        st.write("Model downloaded successfully!")
-        return True
-
-    except Exception as e:
-        st.error(f"Error downloading the model: {e}")
-        return False
+# Path to the model file on your local computer
+model_path = r'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5'
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
@@ -52,14 +34,11 @@ def preprocess_image(img):
 # Streamlit app
 st.title("Educational Toy Classification")
 
-# Download the model file if not already downloaded
-if not os.path.exists(model_path):
-    download_success = download_model_from_drive(model_url, model_path)
-    if not download_success:
-        st.warning("Failed to download the model. Please check the logs for details.")
-
 # Load the model
 model = load_saved_model(model_path)
+
+if model is None:
+    st.warning("Model not loaded. Please check the logs for details.")
 
 # Main app logic
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
