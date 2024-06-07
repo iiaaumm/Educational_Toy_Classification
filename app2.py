@@ -3,7 +3,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import requests
+import gdown
 import os
 
 # Direct download link to the model file on Google Drive
@@ -16,24 +16,8 @@ os.makedirs('./saved_model', exist_ok=True)
 # Function to download the model from Google Drive
 def download_model_from_drive(url, destination):
     try:
-        session = requests.Session()
-        response = session.get(url, stream=True)
-        token = None
-
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                break
-
-        if token:
-            params = {'id': url.split('=')[-1], 'confirm': token}
-            response = session.get(url, params=params, stream=True)
-
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=1024 * 1024):
-                if chunk:
-                    f.write(chunk)
-        
+        st.write("Downloading model... this may take a moment.")
+        gdown.download(url, destination, quiet=False)
         st.write("Model downloaded successfully!")
         return True
 
