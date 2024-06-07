@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
+
 from tensorflow import _keras
 from keras.models import load_model 
 from keras.preprocessing import image
@@ -9,7 +9,7 @@ from PIL import Image
 
 # Load the saved model
 model_path = ('D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5')
-model = tf.keras.models.load_model(model_path)
+
 
 
 # List of class labels
