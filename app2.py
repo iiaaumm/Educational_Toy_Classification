@@ -17,6 +17,8 @@ st.title("Toy Classification")
 
 # URL of the model file in your GitHub repository
 model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/blob/main/model_chunks/Toy_classification_10class.h5?raw=true'
+
+# Loading the model
 model = load_saved_model(model_url)
 
 # List of class labels
