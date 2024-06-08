@@ -1,29 +1,30 @@
 import streamlit as st
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import requests
 import os
-from io import BytesIO
-import zipfile
 
-# Function to download and assemble model chunks
+# Function to download model chunks and assemble them
 def download_model_chunks(url_list, model_path):
     with open(model_path, 'wb') as f:
         for url in url_list:
-            response = requests.get(url)
-            f.write(response.content)
+            response = requests.get(url, stream=True)
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
     return model_path
 
 # URLs of the model chunks on GitHub
 url_list = [
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part0',
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part1',
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part2',
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part3',
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part4',
-    'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part5',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part0',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part1',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part2',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part3',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part4',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part5',
 ]
 
 # Path to save the assembled model
@@ -38,8 +39,6 @@ try:
         st.write("Downloading model... this may take a moment.")
         model_file = download_model_chunks(url_list, model_path)
         st.write("Model downloaded successfully!")
-    else:
-        st.write("Model already downloaded.")
     model = load_model(model_path)
 except Exception as e:
     st.error(f"Error loading the model: {e}")
