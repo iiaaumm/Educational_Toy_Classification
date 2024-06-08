@@ -3,23 +3,41 @@ import numpy as np
 from PIL import Image
 import requests
 from io import BytesIO
+import os
+import urllib.request
 from tensorflow.keras.models import load_model
+
+# Function to download the model file
+def download_model_file(model_url, model_path):
+    # Create saved_model directory if it doesn't exist
+    if not os.path.exists(os.path.dirname(model_path)):
+        os.makedirs(os.path.dirname(model_path))
+        
+    # Download the model file from the URL
+    with urllib.request.urlopen(model_url) as response, open(model_path, 'wb') as out_file:
+        data = response.read() # Read data from response
+        out_file.write(data)   # Write data to file
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
-def load_saved_model(model_url):
-    response = requests.get(model_url)
-    model = load_model(BytesIO(response.content))
+def load_saved_model(model_path):
+    model = load_model(model_path)
     return model
 
 # Streamlit app
 st.title("Toy Classification")
 
 # URL of the model file in your GitHub repository
-model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/blob/main/model_chunks/Toy_classification_10class.h5?raw=true'
+model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5'
+
+# Path to save the assembled model
+model_path = './saved_model/Toy_classification_10class.h5'
+
+# Download the model file
+download_model_file(model_url, model_path)
 
 # Loading the model
-model = load_saved_model(model_url)
+model = load_saved_model(model_path)
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
