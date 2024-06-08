@@ -1,48 +1,23 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 from PIL import Image
 import requests
-import os
+from io import BytesIO
+from tensorflow.keras.models import load_model
 
-# Function to download model chunks and assemble them
-def download_model_chunks(url_list, model_path):
-    with open(model_path, 'wb') as f:
-        for url in url_list:
-            response = requests.get(url, stream=True)
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-    return model_path
+# Function to load the model
+@st.cache(allow_output_mutation=True)
+def load_saved_model(model_url):
+    response = requests.get(model_url)
+    model = load_model(BytesIO(response.content))
+    return model
 
-# URLs of the model chunks on GitHub
-url_list = [
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part0',
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part1',
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part2',
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part3',
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part4',
-    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part5',
-]
+# Streamlit app
+st.title("Toy Classification")
 
-# Path to save the assembled model
-model_path = './saved_model/Toy_classification_10class.h5'
-
-# Ensure the model directory exists
-os.makedirs(os.path.dirname(model_path), exist_ok=True)
-
-# Download and assemble the model
-try:
-    if not os.path.exists(model_path):
-        st.write("Downloading model... this may take a moment.")
-        model_file = download_model_chunks(url_list, model_path)
-        st.write("Model downloaded successfully!")
-    model = load_model(model_path)
-except Exception as e:
-    st.error(f"Error loading the model: {e}")
-    model = None
+# URL of the model file in your GitHub repository
+model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/blob/main/model_chunks/Toy_classification_10class.h5?raw=true'
+model = load_saved_model(model_url)
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
@@ -56,9 +31,6 @@ def preprocess_image(img):
     img = np.expand_dims(img, axis=0)  # Add batch dimension
     return img
 
-# Streamlit app
-st.title("Toy Classification")
-
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -71,21 +43,19 @@ if uploaded_file is not None:
         img_array = preprocess_image(img)
 
         # Perform inference to obtain predictions
-        if model:
-            predictions = model.predict(img_array)
-            # Get the predicted class label
-            predicted_class_index = np.argmax(predictions)
-            predicted_class_label = class_labels[predicted_class_index]
+        predictions = model.predict(img_array)
+        
+        # Get the predicted class label
+        predicted_class_index = np.argmax(predictions)
+        predicted_class_label = class_labels[predicted_class_index]
 
-            # Display the predicted class label
-            st.write(f"Predicted Class: {predicted_class_label}")
+        # Display the predicted class label
+        st.write(f"Predicted Class: {predicted_class_label}")
 
-            # Display the probabilities for each class
-            st.write("Class Probabilities:")
-            for i, class_label in enumerate(class_labels):
-                st.write(f"{class_label}: {predictions[0][i]}")
-        else:
-            st.error("Model not loaded. Please check the logs for details.")
+        # Display the probabilities for each class
+        st.write("Class Probabilities:")
+        for i, class_label in enumerate(class_labels):
+            st.write(f"{class_label}: {predictions[0][i]}")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
