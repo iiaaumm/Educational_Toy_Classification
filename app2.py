@@ -3,9 +3,23 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
+import os
+import requests
 
-# Path to the model file on your local computer
-model_path = r'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_10class.h5'
+# Function to download and reassemble model chunks
+def download_and_assemble_model(url_base, chunk_count, output_path):
+    with open(output_path, 'wb') as output_file:
+        for i in range(chunk_count):
+            chunk_url = f"{url_base}/Toy_classification_10class.h5.part{i}"
+            response = requests.get(chunk_url)
+            response.raise_for_status()  # Ensure the request was successful
+            output_file.write(response.content)
+
+# Download and reassemble the model
+model_url_base = "https://raw.githubusercontent.com/iiaaumm/Educational_Toy_Classification/main/model_chunks"
+model_path = "./Toy_classification_10class.h5"
+chunk_count = 6  # Number of chunks
+download_and_assemble_model(model_url_base, chunk_count, model_path)
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
