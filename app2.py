@@ -1,11 +1,10 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
+from tensorflow.keras.models import load_model
 import requests
 from io import BytesIO
 import os
-import urllib.request
-from tensorflow.keras.models import load_model
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
@@ -14,9 +13,11 @@ def download_model_file(model_url, model_path):
         os.makedirs(os.path.dirname(model_path))
         
     # Download the model file from the URL
-    with urllib.request.urlopen(model_url) as response, open(model_path, 'wb') as out_file:
-        data = response.read() # Read data from response
-        out_file.write(data)   # Write data to file
+    with requests.get(model_url, stream=True) as response:
+        response.raise_for_status()
+        with open(model_path, 'wb') as out_file:
+            for chunk in response.iter_content(chunk_size=8192):
+                out_file.write(chunk)
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
@@ -28,16 +29,24 @@ def load_saved_model(model_path):
 st.title("Toy Classification")
 
 # URL of the model file in your GitHub repository
-model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5'
+model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
 
 # Path to save the assembled model
 model_path = './saved_model/Toy_classification_10class.h5'
 
 # Download the model file
-download_model_file(model_url, model_path)
+try:
+    download_model_file(model_url, model_path)
+    st.write("Model downloaded successfully.")
+except Exception as e:
+    st.error(f"Unable to download the model file: {e}")
 
 # Loading the model
-model = load_saved_model(model_path)
+try:
+    model = load_saved_model(model_path)
+    st.write("Model loaded successfully.")
+except Exception as e:
+    st.error(f"Unable to load the model: {e}")
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
