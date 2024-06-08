@@ -1,39 +1,51 @@
 import streamlit as st
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
-import os
 import requests
+import os
 
-# Function to download and reassemble model chunks
-def download_and_assemble_model(url_base, chunk_count, output_path):
-    with open(output_path, 'wb') as output_file:
-        for i in range(chunk_count):
-            chunk_url = f"{url_base}/Toy_classification_10class.h5.part{i}"
-            response = requests.get(chunk_url)
-            response.raise_for_status()  # Ensure the request was successful
-            output_file.write(response.content)
+# Function to download model chunks and assemble them
+def download_model_chunks(url_list, model_path):
+    with open(model_path, 'wb') as f:
+        for url in url_list:
+            response = requests.get(url, stream=True)
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+    return model_path
 
-# Download and reassemble the model
-model_url_base = "https://raw.githubusercontent.com/iiaaumm/Educational_Toy_Classification/main/model_chunks"
-model_path = "./Toy_classification_10class.h5"
-chunk_count = 6  # Number of chunks
-download_and_assemble_model(model_url_base, chunk_count, model_path)
+# URLs of the model chunks on GitHub
+url_list = [
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part0',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part1',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part2',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part3',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part4',
+    'https://github.com/iiaumm/Educational_Toy_Classification/raw/main/model_chunks/Toy_classification_10class.h5.part5',
+]
 
-# Function to load the model
-@st.cache(allow_output_mutation=True)
-def load_saved_model(model_path):
-    try:
-        model = load_model(model_path)
-        return model
-    except Exception as e:
-        st.error(f"Error loading the model: {e}")
-        return None
+# Path to save the assembled model
+model_path = './saved_model/Toy_classification_10class.h5'
+
+# Ensure the model directory exists
+os.makedirs(os.path.dirname(model_path), exist_ok=True)
+
+# Download and assemble the model
+try:
+    if not os.path.exists(model_path):
+        st.write("Downloading model... this may take a moment.")
+        model_file = download_model_chunks(url_list, model_path)
+        st.write("Model downloaded successfully!")
+    model = load_model(model_path)
+except Exception as e:
+    st.error(f"Error loading the model: {e}")
+    model = None
 
 # List of class labels
-class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 
-                'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
+class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
 
 # Function to preprocess the uploaded image
 def preprocess_image(img):
@@ -45,15 +57,8 @@ def preprocess_image(img):
     return img
 
 # Streamlit app
-st.title("Educational Toy Classification")
+st.title("Toy Classification")
 
-# Load the model
-model = load_saved_model(model_path)
-
-if model is None:
-    st.warning("Model not loaded. Please check the logs for details.")
-
-# Main app logic
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -62,13 +67,12 @@ if uploaded_file is not None:
         img = Image.open(uploaded_file)
         st.image(img, caption='Uploaded Image', use_column_width=True)
 
+        # Preprocess the image
+        img_array = preprocess_image(img)
+
+        # Perform inference to obtain predictions
         if model:
-            # Preprocess the image
-            img_array = preprocess_image(img)
-
-            # Perform inference to obtain predictions
             predictions = model.predict(img_array)
-
             # Get the predicted class label
             predicted_class_index = np.argmax(predictions)
             predicted_class_label = class_labels[predicted_class_index]
@@ -81,7 +85,7 @@ if uploaded_file is not None:
             for i, class_label in enumerate(class_labels):
                 st.write(f"{class_label}: {predictions[0][i]}")
         else:
-            st.warning("Model not loaded. Please check the logs for details.")
+            st.error("Model not loaded. Please check the logs for details.")
 
     except Exception as e:
-        st.error(f"An error occurred during inference: {e}")
+        st.error(f"An error occurred: {e}")
