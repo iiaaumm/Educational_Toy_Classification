@@ -4,14 +4,9 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
 from io import BytesIO
-import os
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
-    # Create saved_model directory if it doesn't exist
-    if not os.path.exists(os.path.dirname(model_path)):
-        os.makedirs(os.path.dirname(model_path))
-        
     # Download the model file from the URL
     with requests.get(model_url, stream=True) as response:
         response.raise_for_status()
@@ -22,8 +17,12 @@ def download_model_file(model_url, model_path):
 # Function to load the model
 @st.cache(allow_output_mutation=True)
 def load_saved_model(model_path):
-    model = load_model(model_path)
-    return model
+    try:
+        model = load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading the model: {e}")
+        return None
 
 # Streamlit app
 st.title("Toy Classification")
@@ -32,7 +31,7 @@ st.title("Toy Classification")
 model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
 
 # Path to save the assembled model
-model_path = './saved_model/Toy_classification_10class.h5'
+model_path = './Toy_classification_10class.h5'
 
 # Download the model file
 try:
@@ -42,11 +41,7 @@ except Exception as e:
     st.error(f"Unable to download the model file: {e}")
 
 # Loading the model
-try:
-    model = load_saved_model(model_path)
-    st.write("Model loaded successfully.")
-except Exception as e:
-    st.error(f"Unable to load the model: {e}")
+model = load_saved_model(model_path)
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
@@ -68,23 +63,24 @@ if uploaded_file is not None:
         img = Image.open(uploaded_file)
         st.image(img, caption='Uploaded Image', use_column_width=True)
 
-        # Preprocess the image
-        img_array = preprocess_image(img)
+        if model:
+            # Preprocess the image
+            img_array = preprocess_image(img)
 
-        # Perform inference to obtain predictions
-        predictions = model.predict(img_array)
-        
-        # Get the predicted class label
-        predicted_class_index = np.argmax(predictions)
-        predicted_class_label = class_labels[predicted_class_index]
+            # Perform inference to obtain predictions
+            predictions = model.predict(img_array)
+            
+            # Get the predicted class label
+            predicted_class_index = np.argmax(predictions)
+            predicted_class_label = class_labels[predicted_class_index]
 
-        # Display the predicted class label
-        st.write(f"Predicted Class: {predicted_class_label}")
+            # Display the predicted class label
+            st.write(f"Predicted Class: {predicted_class_label}")
 
-        # Display the probabilities for each class
-        st.write("Class Probabilities:")
-        for i, class_label in enumerate(class_labels):
-            st.write(f"{class_label}: {predictions[0][i]}")
+            # Display the probabilities for each class
+            st.write("Class Probabilities:")
+            for i, class_label in enumerate(class_labels):
+                st.write(f"{class_label}: {predictions[0][i]}")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
