@@ -26,12 +26,32 @@ def load_saved_model(model_path):
 
 
 
+import streamlit as st
 
+# Custom CSS for headers
+header_style = """
+    <style>
+        .header-text {
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333333;
+        }
+    </style>
+    """
 
+# Apply the custom style
+st.markdown(header_style, unsafe_allow_html=True)
 
-
-st.title("ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
+# Streamlit app
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
 st.title("Classification of Children Toys Using CNN")
+
+
+
+
+#st.title("ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
+#st.title("Classification of Children Toys Using CNN")
 
 
 
