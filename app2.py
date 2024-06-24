@@ -39,13 +39,7 @@ def load_saved_model(model_path):
     font-weight: bold;
     color: #333333;
 }
-import streamlit as st
 
-# Function to load CSS
-def load_css(file_name):
-    with open(file_name, 'r') as f:
-        css = f.read()
-    st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
 # Load CSS styles
 load_css('styles.css')
