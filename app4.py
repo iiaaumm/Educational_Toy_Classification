@@ -5,7 +5,6 @@ from tensorflow.keras.models import load_model
 import requests
 from io import BytesIO
 import os
-import random
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -89,20 +88,22 @@ def preprocess_image(img):
 
 # Display 18 random pictures from the dataset with their labels
 if st.button('Display Random Images'):
-    random_indices = np.random.randint(0, len(image_df), 18)
-    fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
+    if len(image_df) >= 18:
+        random_indices = np.random.randint(0, len(image_df), 18)
+        fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
 
-    for i, ax in enumerate(axes.flat):
-        image_path = image_df.Filepath[random_indices[i]]
-        img = Image.open(image_path)
-        ax.imshow(img)
-        
-        if model:
-            img_array = preprocess_image(img)
-            predictions = model.predict(img_array)
-            predicted_class_index = np.argmax(predictions)
-            predicted_class_label = class_labels[predicted_class_index]
-            ax.set_title(predicted_class_label)
+        for i, ax in enumerate(axes.flat):
+            image_path = image_df.Filepath[random_indices[i]]
+            img = Image.open(image_path)
+            ax.imshow(img)
+            
+            if model:
+                img_array = preprocess_image(img)
+                predictions = model.predict(img_array)
+                predicted_class_index = np.argmax(predictions)
+                predicted_class_label = class_labels[predicted_class_index]
+                ax.set_title(predicted_class_label)
 
-    st.pyplot(fig)
-
+        st.pyplot(fig)
+    else:
+        st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
