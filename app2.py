@@ -31,7 +31,7 @@ def load_saved_model(model_path):
 header_style = """
     <style>
         .header-text {
-            font-family: Arial, sans-serif;
+            font-family: Phetsalath OT, sans-serif;
             font-size: 24px;
             font-weight: bold;
             color: #333333;
