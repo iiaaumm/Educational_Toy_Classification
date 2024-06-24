@@ -26,8 +26,6 @@ def load_saved_model(model_path):
 
 
 
-
-
 import streamlit as st
 
 # Custom CSS for headers with Google Fonts (Noto Sans Lao Looped)
@@ -38,10 +36,9 @@ header_style = """
 
         .header-text {
             font-family: 'Noto Sans Lao Looped', sans-serif;
-            font-size: 36px; /* Adjust font size as needed */
+            font-size: 30px;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 20px; /* Add margin bottom for spacing */
         }
     </style>
     """
@@ -49,8 +46,9 @@ header_style = """
 # Apply the custom style with Google Fonts
 st.markdown(header_style, unsafe_allow_html=True)
 
-# Display the custom styled title using HTML
-st.markdown("<h1 class='header-text'>Classification of Children Toys Using CNN</h1>", unsafe_allow_html=True)
+# Streamlit app
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+st.title("Classification of Children Toys Using CNN")
 
 
 
