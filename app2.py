@@ -46,6 +46,9 @@ header_style = """
 # Apply the custom style with Google Fonts
 st.markdown(header_style, unsafe_allow_html=True)
 
+# Detect current theme mode
+theme_class = "light-mode" if st.get_option('theme.secondaryTextColor') == '#000000' else ""
+
 
 # Streamlit app
 st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
