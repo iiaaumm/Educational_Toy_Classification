@@ -50,7 +50,7 @@ header_style = """
 st.title(header_style, unsafe_allow_html=True)
 
 # Streamlit app
-st.title("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+#st.title("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
 st.title("Classification of Children Toys Using CNN")
 
 
