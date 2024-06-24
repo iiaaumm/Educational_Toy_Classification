@@ -24,9 +24,30 @@ def load_saved_model(model_path):
         st.error(f"Error loading the model: {e}")
         return None
 
+
+
+
+# Custom CSS for headers
+header_style = """
+    <style>
+        .header-text {
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333333;
+        }
+    </style>
+    """
+
+# Apply the custom style
+st.markdown(header_style, unsafe_allow_html=True)
+
 # Streamlit app
-st.title("ລະບົບຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
+st.title("<div class='header-text'>ການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</div>", unsafe_allow_html=True)
 st.title("Classification of Children Toys Using CNN")
+
+
+
 
 
 # URL of the model file in your GitHub repository
