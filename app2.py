@@ -47,7 +47,7 @@ header_style = """
 st.markdown(header_style, unsafe_allow_html=True)
 
 # Detect current theme mode
-theme_class = "light-mode" if st.get_option('theme.secondaryTextColor') == '#000000' else ""
+theme_class = "light-mode" if st.get_option('theme.secondaryTextColor') == '#333333' else "#ffffff"
 
 
 # Streamlit app
