@@ -27,6 +27,40 @@ def load_saved_model(model_path):
 
 
 
+
+
+/* styles.css */
+
+/* Include Google Fonts stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Phetsalath+OT:wght@400;700&display=swap');
+
+.header-text {
+    font-family: 'Phetsalath OT', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333;
+}
+import streamlit as st
+
+# Function to load CSS
+def load_css(file_name):
+    with open(file_name, 'r') as f:
+        css = f.read()
+    st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+
+# Load CSS styles
+load_css('styles.css')
+
+# Streamlit app
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+st.title("Classification of Children Toys Using CNN")
+
+
+
+
+
+
+
 # Custom CSS for headers
 header_style = """
     <style>
@@ -51,6 +85,9 @@ st.title("Classification of Children Toys Using CNN")
 
 #st.title("ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
 #st.title("Classification of Children Toys Using CNN")
+
+
+
 
 
 
