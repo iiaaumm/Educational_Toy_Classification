@@ -37,7 +37,7 @@ header_style = """
             font-family: 'Noto Sans Lao Looped', sans-serif;
             font-size: 36px; /* Adjust font size as needed */
             font-weight: bold;
-            color: #333333;
+            color: #ffffff;
             margin-bottom: 20px; /* Add margin bottom for spacing */
         }
     </style>
