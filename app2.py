@@ -26,24 +26,6 @@ def load_saved_model(model_path):
 
 
 
-import streamlit as st
-/* styles.css */
-
-@font-face {
-    font-family: 'Phetsalath OT';
-    src: url('./PhetsalathOT-Regular.woff2') format('woff2'),  /* Replace with your actual font file name and format */
-         url('./PhetsalathOT-Regular.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-.header-text {
-    font-family: 'Phetsalath OT', Arial, sans-serif;  /* Use the custom font */
-    font-size: 24px;
-    font-weight: bold;
-    color: #333333;
-}
-
 
 # Custom CSS for headers
 header_style = """
