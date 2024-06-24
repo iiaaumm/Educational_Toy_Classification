@@ -25,7 +25,9 @@ def load_saved_model(model_path):
         return None
 
 # Streamlit app
-st.title("Toy Classification")
+st.title("ລະບົບຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
+st.title("Classification of Children Toys Using CNN")
+
 
 # URL of the model file in your GitHub repository
 model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
