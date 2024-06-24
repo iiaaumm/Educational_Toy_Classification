@@ -47,10 +47,10 @@ header_style = """
     """
 
 # Apply the custom style with Google Fonts
-st.markdown(header_style, unsafe_allow_html=True)
+st.title(header_style, unsafe_allow_html=True)
 
 # Streamlit app
-st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+st.title("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
 st.title("Classification of Children Toys Using CNN")
 
 
