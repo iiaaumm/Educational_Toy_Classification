@@ -36,7 +36,6 @@ def load_saved_model(model_path):
 
 .header-text {
     font-family: 'Phetsalath OT', sans-serif;
-    font-size: 24px;
     font-weight: bold;
     color: #333333;
 }
