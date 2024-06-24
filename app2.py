@@ -39,9 +39,6 @@ header_style = """
             font-weight: bold;
             color: #333333;
             margin-bottom: 20px; /* Add margin bottom for spacing */
-            border: 2px solid #333333; /* Border style */
-            padding: 10px; /* Padding inside the border */
-            display: inline-block; /* Ensures the border wraps around the text */
         }
     </style>
     """
