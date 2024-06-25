@@ -4,12 +4,10 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
 from io import BytesIO
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
+    # Download the model file from the URL
     with requests.get(model_url, stream=True) as response:
         response.raise_for_status()
         with open(model_path, 'wb') as out_file:
@@ -26,25 +24,50 @@ def load_saved_model(model_path):
         st.error(f"Error loading the model: {e}")
         return None
 
+
+import streamlit as st
+
 # Custom CSS for headers with Google Fonts (Noto Sans Lao Looped)
 header_style = """
     <style>
+        /* Import Google Fonts stylesheet for Noto Sans Lao Looped */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped&display=swap');
+
         .header-text {
             font-family: 'Noto Sans Lao Looped', sans-serif;
-            font-size: 36px;
+            font-size: 36px; /* Adjust font size as needed */
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Add margin bottom for spacing */
         }
     </style>
     """
+
+# Apply the custom style with Google Fonts
 st.markdown(header_style, unsafe_allow_html=True)
-st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວວນເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+
+
+
+# Streamlit app
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
 st.markdown("<p class='header-text'>Classification of Children Toys Using CNN</p>", unsafe_allow_html=True)
+
+
+
+#st.title("ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN")
+#st.title("Classification of Children Toys Using CNN")
+
+
+
+
+
+
+
 
 # URL of the model file in your GitHub repository
 model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
+
+# Path to save the assembled model
 model_path = './Toy_classification_10class.h5'
 
 # Download the model file
@@ -60,85 +83,41 @@ model = load_saved_model(model_path)
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
 
-# Path to your image dataset
-image_folder_path = r'D:\STUDY\Year4\Development_Toy-A-10class\resized_augmented_test'
-
-# Get all image file paths and their corresponding labels
-image_paths = []
-labels = []
-for root, dirs, files in os.walk(image_folder_path):
-    for file in files:
-        if file.endswith(('png', 'jpg', 'jpeg', 'bmp', 'gif')):
-            file_path = os.path.join(root, file)
-            label = os.path.basename(root)  # Assuming the directory name is the label
-            image_paths.append(file_path)
-            labels.append(label)
-
-# Create a dataframe to hold file paths and labels
-image_df = pd.DataFrame({'Filepath': image_paths, 'Label': labels})
-
 # Function to preprocess the uploaded image
 def preprocess_image(img):
-    img = img.convert('RGB')
-    img = img.resize((150, 150))
-    img = np.array(img)
-    img = img / 255.0
-    img = np.expand_dims(img, axis=0)
+    img = img.convert('RGB')  # Ensure image is in RGB format
+    img = img.resize((150, 150))  # Resize image to match model's expected sizing
+    img = np.array(img)  # Convert image to numpy array
+    img = img / 255.0  # Normalize pixel values to be between 0 and 1
+    img = np.expand_dims(img, axis=0)  # Add batch dimension
     return img
 
-# Display 18 random pictures from the dataset with their labels
-if st.button('Display Random Images'):
-    if len(image_df) >= 18:
-        random_indices = np.random.randint(0, len(image_df), 18)
-        fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-        for i, ax in enumerate(axes.flat):
-            image_path = image_df.Filepath[random_indices[i]]
-            img = Image.open(image_path)
-            ax.imshow(img)
+if uploaded_file is not None:
+    try:
+        # Display the uploaded image
+        img = Image.open(uploaded_file)
+        st.image(img, caption='Uploaded Image', use_column_width=True)
+
+        if model:
+            # Preprocess the image
+            img_array = preprocess_image(img)
+
+            # Perform inference to obtain predictions
+            predictions = model.predict(img_array)
             
-            if model:
-                img_array = preprocess_image(img)
-                predictions = model.predict(img_array)
-                predicted_class_index = np.argmax(predictions)
-                predicted_class_label = class_labels[predicted_class_index]
-                ax.set_title(predicted_class_label)
+            # Get the predicted class label
+            predicted_class_index = np.argmax(predictions)
+            predicted_class_label = class_labels[predicted_class_index]
 
-        st.pyplot(fig)
-    else:
-        st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
+            # Display the predicted class label
+            st.write(f"Predicted Class: {predicted_class_label}")
 
-# Select box for ranking predictions
-st.subheader("Ranking Predictions")
-selected_class = st.selectbox("Select a toy category:", class_labels)
-if model:
-    counts = {label: 0 for label in class_labels}
-    
-    for index, row in image_df.iterrows():
-        img = Image.open(row['Filepath'])
-        img_array = preprocess_image(img)
-        predictions = model.predict(img_array)
-        predicted_class_index = np.argmax(predictions)
-        predicted_class_label = class_labels[predicted_class_index]
-        
-        if predicted_class_label == selected_class:
-            counts[selected_class] += 1
-    
-    st.write(f"Number of times '{selected_class}' was predicted:", counts[selected_class])
+            # Display the probabilities for each class
+            st.write("Class Probabilities:")
+            for i, class_label in enumerate(class_labels):
+                st.write(f"{class_label}: {predictions[0][i]}")
 
-# Table to display image data
-st.subheader("Image Data")
-st.table(image_df.head())
-
-# Custom CSS for additional styling
-custom_css = """
-    <style>
-        .ranking-container {
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-    </style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
