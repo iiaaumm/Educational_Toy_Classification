@@ -1,36 +1,10 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
 from collections import Counter
 import datetime
-
-import requests
-
-# Function to download the model file
-def download_model_file(model_url, model_path):
-    try:
-        with requests.get(model_url, stream=True) as response:
-            response.raise_for_status()
-            with open(model_path, 'wb') as out_file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    out_file.write(chunk)
-        st.write("Model downloaded successfully.")
-    except Exception as e:
-        st.error(f"Unable to download the model file: {e}")
-
-# URL of the model file in your GitHub repository
-model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
-model_path = './Toy_classification_10class.h5'
-
-# Download the model file
-download_model_file(model_url, model_path)
-
-
-
-
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
@@ -79,7 +53,7 @@ header_style = """
     </style>
     """
 st.markdown(header_style, unsafe_allow_html=True)
-st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວຍເຕັກນິກ CNN</p>", unsafe_allow_html=True)
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວວກນິກ CNN</p>", unsafe_allow_html=True)
 st.markdown("<p class='header-text'>Classification of Children Toys Using CNN</p>", unsafe_allow_html=True)
 
 # URL of the model file in your GitHub repository
@@ -108,91 +82,39 @@ def preprocess_image(img):
     img = np.expand_dims(img, axis=0)  # Add batch dimension
     return img
 
-# Sidebar with various components
-with st.sidebar:
-    st.header("Settings")
-    selected_label = st.selectbox("Choose a class label", class_labels)
-    selected_date = st.date_input("Select a date")
-    selected_date_range = st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-# Tabs
-tab1, tab2, tab3 = st.tabs(["Upload & Predict", "Random Images", "Prediction Rankings"])
+if uploaded_file is not None:
+    try:
+        # Display the uploaded image
+        img = Image.open(uploaded_file)
+        st.image(img, caption='Uploaded Image', use_column_width=True)
 
-with tab1:
-    st.header("Upload an Image for Prediction")
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+        if model:
+            # Preprocess the image
+            img_array = preprocess_image(img)
 
-    if uploaded_file is not None:
-        try:
-            # Display the uploaded image
-            img = Image.open(uploaded_file)
-            st.image(img, caption='Uploaded Image', use_column_width=True)
+            # Perform inference to obtain predictions
+            predictions = model.predict(img_array)
 
-            if model:
-                # Preprocess the image
-                img_array = preprocess_image(img)
+            # Get the predicted class label
+            predicted_class_index = np.argmax(predictions)
+            predicted_class_label = class_labels[predicted_class_index]
 
-                # Perform inference to obtain predictions
-                predictions = model.predict(img_array)
+            # Update the prediction counter
+            st.session_state.prediction_counter[predicted_class_label] += 1
 
-                # Get the predicted class label
-                predicted_class_index = np.argmax(predictions)
-                predicted_class_label = class_labels[predicted_class_index]
+            # Display the predicted class label
+            st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
 
-                # Update the prediction counter
-                st.session_state.prediction_counter[predicted_class_label] += 1
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
-                # Display the predicted class label
-                st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
-
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-
-with tab2:
-    st.header("Display Random Images from Dataset")
-    if st.button('Display Random Images'):
-        # Assuming you have the logic to display random images from your dataset here
-        st.write("Displaying random images...")
-
-with tab3:
-    st.header("Prediction Rankings")
-    if st.session_state.prediction_counter:
-        prediction_df = pd.DataFrame(st.session_state.prediction_counter.items(), columns=['Class Label', 'Count'])
-        prediction_df = prediction_df.sort_values(by='Count', ascending=False).reset_index(drop=True)
-        st.table(prediction_df)
-    else:
-        st.write("No predictions have been made yet.")
-
-# Additional Components
-st.header("Additional Components")
-text_input_value = st.text_input("Enter some text")
-slider_value = st.slider("Select a range", 0, 100, (25, 75))
-button_clicked = st.button("Click Me")
-
-# Display collected values
-st.write("Text Input Value:", text_input_value)
-st.write("Slider Value:", slider_value)
-st.write("Button Clicked:", button_clicked)
-
-# Table
-st.header("Data Table")
-sample_data = {
-    "Column 1": [1, 2, 3],
-    "Column 2": [4, 5, 6]
-}
-st.table(sample_data)
-
-# Alert Dialog (simulated using st.info, st.warning, etc.)
-st.info("This is an info alert")
-st.warning("This is a warning alert")
-st.error("This is an error alert")
-
-# Badge (simulated using markdown)
-st.markdown("<span style='background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 5px;'>Badge Example</span>", unsafe_allow_html=True)
-
-# Link Button
-if st.button("Go to GitHub"):
-    st.write("[GitHub Repository](https://github.com/iiaaumm/Educational_Toy_Classification)")
-
-# Avatar (simulated using image)
-st.image("https://avatars.githubusercontent.com/u/9919?s=280&v=4", width=50, caption="Avatar Example")
+# Prediction Rankings
+st.header("Prediction Rankings")
+if st.session_state.prediction_counter:
+    prediction_df = pd.DataFrame(st.session_state.prediction_counter.items(), columns=['Class Label', 'Count'])
+    prediction_df = prediction_df.sort_values(by='Count', ascending=False).reset_index(drop=True)
+    st.table(prediction_df)
+else:
+    st.write("No predictions have been made yet.")
