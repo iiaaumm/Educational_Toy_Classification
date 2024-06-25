@@ -72,8 +72,13 @@ except Exception as e:
 # Loading the model
 model = load_saved_model(model_path)
 
-# List of class labels
-class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
+# Initialize prediction counts dictionary
+prediction_counts = {label: 0 for label in ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']}
+
+# Function to update prediction counts
+def update_prediction_counts(predicted_class_label):
+    if predicted_class_label in prediction_counts:
+        prediction_counts[predicted_class_label] += 1
 
 # Function to classify uploaded image
 def classify_image(uploaded_file):
@@ -96,7 +101,7 @@ def classify_image(uploaded_file):
             # Display the predicted class label
             st.write(f"Predicted Class: {predicted_class_label}")
 
-            # Update prediction counts (for future ranking display)
+            # Update prediction counts
             update_prediction_counts(predicted_class_label)
 
             # Display the probabilities for each class
@@ -106,11 +111,6 @@ def classify_image(uploaded_file):
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
-
-# Function to update prediction counts (dummy implementation)
-def update_prediction_counts(predicted_class_label):
-    # Implement actual logic to update prediction counts (e.g., using a database or session state)
-    pass
 
 # Main content area with file uploader and classification button
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -124,32 +124,9 @@ selected_tab = st.radio("View", tabs)
 
 # Display content based on selected tab
 if selected_tab == "Rankings":
-    # Function to calculate and show class rankings based on predictions
-    def show_rankings():
-        # Replace with actual calculation or retrieval of prediction counts
-        # For demo purposes, using mock data
-        prediction_counts = {
-            'Activity_Cube': 10,
-            'Ball': 0,
-            'Puzzle': 14,
-            'Rubik': 10,
-            'Tricycle': 0,
-            'baby_walker': 3,
-            'lego': 0,
-            'poppet': 0,
-            'rattle': 0,
-            'stacking': 0
-        }
-
-        # Sort classes based on prediction counts
-        sorted_classes = sorted(prediction_counts.items(), key=lambda x: x[1], reverse=True)
-
-        # Display table
-        st.write("Class Rankings based on Predictions:")
-        st.write("| Class | Predicted Count |")
-        st.write("| --- | --- |")
-        for class_label, count in sorted_classes:
-            st.write(f"| {class_label} | {count} |")
-
-    # Show rankings
-    show_rankings()
+    # Show rankings based on prediction counts
+    st.write("Class Rankings based on Predictions:")
+    st.write("| Class | Predicted Count |")
+    st.write("| --- | --- |")
+    for class_label in class_labels:
+        st.write(f"| {class_label} | {prediction_counts[class_label]} |")
