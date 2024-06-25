@@ -37,6 +37,17 @@ header_style = """
             color: #ffffff;
             margin-bottom: 20px;
         }
+        .prediction-box {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #4CAF50;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
     """
 st.markdown(header_style, unsafe_allow_html=True)
@@ -100,7 +111,7 @@ if uploaded_file is not None:
     predicted_class_index = np.argmax(predictions)
     predicted_class_label = class_labels[predicted_class_index]
     
-    st.write(f"Prediction: {predicted_class_label}")
+    st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
 
 # Display 18 random pictures from the dataset with their labels
 if st.button('Display Random Images'):
