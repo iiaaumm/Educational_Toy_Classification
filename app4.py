@@ -81,7 +81,6 @@ def preprocess_image(img):
 # Sidebar with various components
 with st.sidebar:
     st.header("Settings")
-    enable_feature = st.checkbox("Enable some feature")
     selected_label = st.selectbox("Choose a class label", class_labels)
     selected_date = st.date_input("Select a date")
     selected_date_range = st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
@@ -125,18 +124,12 @@ with tab2:
 # Additional Components
 st.header("Additional Components")
 text_input_value = st.text_input("Enter some text")
-text_area_value = st.text_area("Enter a longer text")
 slider_value = st.slider("Select a range", 0, 100, (25, 75))
-radio_value = st.radio("Choose an option", ["Option 1", "Option 2", "Option 3"])
-switch_value = st.switch("Enable feature")
 button_clicked = st.button("Click Me")
 
 # Display collected values
 st.write("Text Input Value:", text_input_value)
-st.write("Text Area Value:", text_area_value)
 st.write("Slider Value:", slider_value)
-st.write("Radio Value:", radio_value)
-st.write("Switch Value:", switch_value)
 st.write("Button Clicked:", button_clicked)
 
 # Table
@@ -161,7 +154,3 @@ if st.button("Go to GitHub"):
 
 # Avatar (simulated using image)
 st.image("https://avatars.githubusercontent.com/u/9919?s=280&v=4", width=50, caption="Avatar Example")
-
-# Hover Card (simulated using st.expander)
-with st.expander("Hover Card Example"):
-    st.write("This is an example of hover card functionality.")
