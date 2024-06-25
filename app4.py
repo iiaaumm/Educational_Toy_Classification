@@ -3,23 +3,21 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
-from collections import Counter
-import datetime
+from io import BytesIO
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
-    try:
-        with requests.get(model_url, stream=True) as response:
-            response.raise_for_status()
-            with open(model_path, 'wb') as out_file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    out_file.write(chunk)
-        st.write("Model downloaded successfully.")
-    except Exception as e:
-        st.error(f"Unable to download the model file: {e}")
+    with requests.get(model_url, stream=True) as response:
+        response.raise_for_status()
+        with open(model_path, 'wb') as out_file:
+            for chunk in response.iter_content(chunk_size=8192):
+                out_file.write(chunk)
 
 # Function to load the model
-@st.cache_resource
+@st.cache(allow_output_mutation=True)
 def load_saved_model(model_path):
     try:
         model = load_model(model_path)
@@ -39,21 +37,10 @@ header_style = """
             color: #ffffff;
             margin-bottom: 20px;
         }
-        .prediction-box {
-            font-family: 'Noto Sans Lao Looped', sans-serif;
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffffff;
-            background-color: #4CAF50;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-        }
     </style>
     """
 st.markdown(header_style, unsafe_allow_html=True)
-st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວວກນິກ CNN</p>", unsafe_allow_html=True)
+st.markdown("<p class='header-text'>ລະບົບການຈໍາແນກເຄື່ອງຫຼິ້ນເສີມທັກສະຂອງເດັກນ້ອຍດ້ວວນເຕັກນິກ CNN</p>", unsafe_allow_html=True)
 st.markdown("<p class='header-text'>Classification of Children Toys Using CNN</p>", unsafe_allow_html=True)
 
 # URL of the model file in your GitHub repository
@@ -61,7 +48,11 @@ model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/
 model_path = './Toy_classification_10class.h5'
 
 # Download the model file
-download_model_file(model_url, model_path)
+try:
+    download_model_file(model_url, model_path)
+    st.write("Model downloaded successfully.")
+except Exception as e:
+    st.error(f"Unable to download the model file: {e}")
 
 # Loading the model
 model = load_saved_model(model_path)
@@ -69,52 +60,85 @@ model = load_saved_model(model_path)
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
 
-# Initialize a Counter to keep track of predictions
-if 'prediction_counter' not in st.session_state:
-    st.session_state.prediction_counter = Counter()
+# Path to your image dataset
+image_folder_path = r'D:\STUDY\Year4\Development_Toy-A-10class\resized_augmented_test'
+
+# Get all image file paths and their corresponding labels
+image_paths = []
+labels = []
+for root, dirs, files in os.walk(image_folder_path):
+    for file in files:
+        if file.endswith(('png', 'jpg', 'jpeg', 'bmp', 'gif')):
+            file_path = os.path.join(root, file)
+            label = os.path.basename(root)  # Assuming the directory name is the label
+            image_paths.append(file_path)
+            labels.append(label)
+
+# Create a dataframe to hold file paths and labels
+image_df = pd.DataFrame({'Filepath': image_paths, 'Label': labels})
 
 # Function to preprocess the uploaded image
 def preprocess_image(img):
-    img = img.convert('RGB')  # Ensure image is in RGB format
-    img = img.resize((150, 150))  # Resize image to match model's expected sizing
-    img = np.array(img)  # Convert image to numpy array
-    img = img / 255.0  # Normalize pixel values to be between 0 and 1
-    img = np.expand_dims(img, axis=0)  # Add batch dimension
+    img = img.convert('RGB')
+    img = img.resize((150, 150))
+    img = np.array(img)
+    img = img / 255.0
+    img = np.expand_dims(img, axis=0)
     return img
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+# Display 18 random pictures from the dataset with their labels
+if st.button('Display Random Images'):
+    if len(image_df) >= 18:
+        random_indices = np.random.randint(0, len(image_df), 18)
+        fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
 
-if uploaded_file is not None:
-    try:
-        # Display the uploaded image
-        img = Image.open(uploaded_file)
-        st.image(img, caption='Uploaded Image', use_column_width=True)
+        for i, ax in enumerate(axes.flat):
+            image_path = image_df.Filepath[random_indices[i]]
+            img = Image.open(image_path)
+            ax.imshow(img)
+            
+            if model:
+                img_array = preprocess_image(img)
+                predictions = model.predict(img_array)
+                predicted_class_index = np.argmax(predictions)
+                predicted_class_label = class_labels[predicted_class_index]
+                ax.set_title(predicted_class_label)
 
-        if model:
-            # Preprocess the image
-            img_array = preprocess_image(img)
+        st.pyplot(fig)
+    else:
+        st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
 
-            # Perform inference to obtain predictions
-            predictions = model.predict(img_array)
+# Select box for ranking predictions
+st.subheader("Ranking Predictions")
+selected_class = st.selectbox("Select a toy category:", class_labels)
+if model:
+    counts = {label: 0 for label in class_labels}
+    
+    for index, row in image_df.iterrows():
+        img = Image.open(row['Filepath'])
+        img_array = preprocess_image(img)
+        predictions = model.predict(img_array)
+        predicted_class_index = np.argmax(predictions)
+        predicted_class_label = class_labels[predicted_class_index]
+        
+        if predicted_class_label == selected_class:
+            counts[selected_class] += 1
+    
+    st.write(f"Number of times '{selected_class}' was predicted:", counts[selected_class])
 
-            # Get the predicted class label
-            predicted_class_index = np.argmax(predictions)
-            predicted_class_label = class_labels[predicted_class_index]
+# Table to display image data
+st.subheader("Image Data")
+st.table(image_df.head())
 
-            # Update the prediction counter
-            st.session_state.prediction_counter[predicted_class_label] += 1
-
-            # Display the predicted class label
-            st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
-
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-
-# Prediction Rankings
-st.header("Prediction Rankings")
-if st.session_state.prediction_counter:
-    prediction_df = pd.DataFrame(st.session_state.prediction_counter.items(), columns=['Class Label', 'Count'])
-    prediction_df = prediction_df.sort_values(by='Count', ascending=False).reset_index(drop=True)
-    st.table(prediction_df)
-else:
-    st.write("No predictions have been made yet.")
+# Custom CSS for additional styling
+custom_css = """
+    <style>
+        .ranking-container {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
