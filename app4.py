@@ -7,6 +7,7 @@ from io import BytesIO
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import datetime
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
@@ -97,40 +98,85 @@ def preprocess_image(img):
     img = np.expand_dims(img, axis=0)
     return img
 
-# File uploader for user to upload an image
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "bmp", "gif"])
+# Streamlit Components
+with st.sidebar:
+    st.header("Settings")
+    st.checkbox("Enable some feature")
+    st.selectbox("Choose a class label", class_labels)
+    st.date_input("Select a date")
+    st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
 
-if uploaded_file is not None:
-    # Load and display the uploaded image
-    img = Image.open(uploaded_file)
-    st.image(img, caption='Uploaded Image', use_column_width=True)
+# Tabs
+tab1, tab2 = st.tabs(["Upload & Predict", "Random Images"])
+
+with tab1:
+    st.header("Upload an Image for Prediction")
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "bmp", "gif"])
     
-    # Preprocess the image and make a prediction
-    img_array = preprocess_image(img)
-    predictions = model.predict(img_array)
-    predicted_class_index = np.argmax(predictions)
-    predicted_class_label = class_labels[predicted_class_index]
-    
-    st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
+    if uploaded_file is not None:
+        # Load and display the uploaded image
+        img = Image.open(uploaded_file)
+        st.image(img, caption='Uploaded Image', use_column_width=True)
+        
+        # Preprocess the image and make a prediction
+        img_array = preprocess_image(img)
+        predictions = model.predict(img_array)
+        predicted_class_index = np.argmax(predictions)
+        predicted_class_label = class_labels[predicted_class_index]
+        
+        st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
 
-# Display 18 random pictures from the dataset with their labels
-if st.button('Display Random Images'):
-    if len(image_df) >= 18:
-        random_indices = np.random.randint(0, len(image_df), 18)
-        fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
+with tab2:
+    st.header("Display Random Images from Dataset")
+    if st.button('Display Random Images'):
+        if len(image_df) >= 18:
+            random_indices = np.random.randint(0, len(image_df), 18)
+            fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
 
-        for i, ax in enumerate(axes.flat):
-            image_path = image_df.Filepath[random_indices[i]]
-            img = Image.open(image_path)
-            ax.imshow(img)
-            
-            if model:
-                img_array = preprocess_image(img)
-                predictions = model.predict(img_array)
-                predicted_class_index = np.argmax(predictions)
-                predicted_class_label = class_labels[predicted_class_index]
-                ax.set_title(predicted_class_label, fontsize=8)
+            for i, ax in enumerate(axes.flat):
+                image_path = image_df.Filepath[random_indices[i]]
+                img = Image.open(image_path)
+                ax.imshow(img)
+                
+                if model:
+                    img_array = preprocess_image(img)
+                    predictions = model.predict(img_array)
+                    predicted_class_index = np.argmax(predictions)
+                    predicted_class_label = class_labels[predicted_class_index]
+                    ax.set_title(predicted_class_label, fontsize=8)
 
-        st.pyplot(fig)
-    else:
-        st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
+            st.pyplot(fig)
+        else:
+            st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
+
+# Additional Components
+st.header("Additional Components")
+st.text_input("Enter some text")
+st.text_area("Enter a longer text")
+st.slider("Select a range", 0, 100, (25, 75))
+st.radio("Choose an option", ["Option 1", "Option 2", "Option 3"])
+st.switch("Enable feature")
+st.button("Click Me")
+
+# Table
+st.header("Data Table")
+st.dataframe(image_df.head())
+
+# Alert Dialog (simulated using st.info, st.warning, etc.)
+st.info("This is an info alert")
+st.warning("This is a warning alert")
+st.error("This is an error alert")
+
+# Badges (simulated using markdown)
+st.markdown("<span style='background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 5px;'>Badge Example</span>", unsafe_allow_html=True)
+
+# Link Button
+if st.button("Go to GitHub"):
+    st.write("[GitHub Repository](https://github.com/iiaaumm/Educational_Toy_Classification)")
+
+# Avatar (simulated using image)
+st.image("https://avatars.githubusercontent.com/u/9919?s=280&v=4", width=50, caption="Avatar Example")
+
+# Hover Card (simulated using st.expander)
+with st.expander("Hover Card Example"):
+    st.write("This is an example of hover card functionality.")
