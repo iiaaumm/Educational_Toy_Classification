@@ -3,8 +3,8 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
-from io import BytesIO
 import datetime
+from collections import Counter
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
@@ -69,6 +69,10 @@ model = load_saved_model(model_path)
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
 
+# Initialize a Counter to keep track of predictions
+if 'prediction_counter' not in st.session_state:
+    st.session_state.prediction_counter = Counter()
+
 # Function to preprocess the uploaded image
 def preprocess_image(img):
     img = img.convert('RGB')  # Ensure image is in RGB format
@@ -86,7 +90,7 @@ with st.sidebar:
     selected_date_range = st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
 
 # Tabs
-tab1, tab2 = st.tabs(["Upload & Predict", "Random Images"])
+tab1, tab2, tab3 = st.tabs(["Upload & Predict", "Random Images", "Prediction Rankings"])
 
 with tab1:
     st.header("Upload an Image for Prediction")
@@ -109,6 +113,9 @@ with tab1:
                 predicted_class_index = np.argmax(predictions)
                 predicted_class_label = class_labels[predicted_class_index]
 
+                # Update the prediction counter
+                st.session_state.prediction_counter[predicted_class_label] += 1
+
                 # Display the predicted class label
                 st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
 
@@ -120,6 +127,15 @@ with tab2:
     if st.button('Display Random Images'):
         # Assuming you have the logic to display random images from your dataset here
         st.write("Displaying random images...")
+
+with tab3:
+    st.header("Prediction Rankings")
+    if st.session_state.prediction_counter:
+        prediction_df = pd.DataFrame(st.session_state.prediction_counter.items(), columns=['Class Label', 'Count'])
+        prediction_df = prediction_df.sort_values(by='Count', ascending=False).reset_index(drop=True)
+        st.table(prediction_df)
+    else:
+        st.write("No predictions have been made yet.")
 
 # Additional Components
 st.header("Additional Components")
