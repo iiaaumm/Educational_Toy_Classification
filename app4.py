@@ -7,6 +7,31 @@ import requests
 from collections import Counter
 import datetime
 
+import requests
+
+# Function to download the model file
+def download_model_file(model_url, model_path):
+    try:
+        with requests.get(model_url, stream=True) as response:
+            response.raise_for_status()
+            with open(model_path, 'wb') as out_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    out_file.write(chunk)
+        st.write("Model downloaded successfully.")
+    except Exception as e:
+        st.error(f"Unable to download the model file: {e}")
+
+# URL of the model file in your GitHub repository
+model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
+model_path = './Toy_classification_10class.h5'
+
+# Download the model file
+download_model_file(model_url, model_path)
+
+
+
+
+
 # Function to download the model file
 def download_model_file(model_url, model_path):
     try:
