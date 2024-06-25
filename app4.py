@@ -1,18 +1,23 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
-import datetime
 from collections import Counter
+import datetime
 
 # Function to download the model file
 def download_model_file(model_url, model_path):
-    with requests.get(model_url, stream=True) as response:
-        response.raise_for_status()
-        with open(model_path, 'wb') as out_file:
-            for chunk in response.iter_content(chunk_size=8192):
-                out_file.write(chunk)
+    try:
+        with requests.get(model_url, stream=True) as response:
+            response.raise_for_status()
+            with open(model_path, 'wb') as out_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    out_file.write(chunk)
+        st.write("Model downloaded successfully.")
+    except Exception as e:
+        st.error(f"Unable to download the model file: {e}")
 
 # Function to load the model
 @st.cache_resource
@@ -57,11 +62,7 @@ model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/
 model_path = './Toy_classification_10class.h5'
 
 # Download the model file
-try:
-    download_model_file(model_url, model_path)
-    st.write("Model downloaded successfully.")
-except Exception as e:
-    st.error(f"Unable to download the model file: {e}")
+download_model_file(model_url, model_path)
 
 # Loading the model
 model = load_saved_model(model_path)
