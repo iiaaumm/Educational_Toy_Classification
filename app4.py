@@ -17,7 +17,7 @@ def download_model_file(model_url, model_path):
                 out_file.write(chunk)
 
 # Function to load the model
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_saved_model(model_path):
     try:
         model = load_model(model_path)
@@ -86,6 +86,22 @@ def preprocess_image(img):
     img = np.expand_dims(img, axis=0)
     return img
 
+# File uploader for user to upload an image
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "bmp", "gif"])
+
+if uploaded_file is not None:
+    # Load and display the uploaded image
+    img = Image.open(uploaded_file)
+    st.image(img, caption='Uploaded Image', use_column_width=True)
+    
+    # Preprocess the image and make a prediction
+    img_array = preprocess_image(img)
+    predictions = model.predict(img_array)
+    predicted_class_index = np.argmax(predictions)
+    predicted_class_label = class_labels[predicted_class_index]
+    
+    st.write(f"Prediction: {predicted_class_label}")
+
 # Display 18 random pictures from the dataset with their labels
 if st.button('Display Random Images'):
     if len(image_df) >= 18:
@@ -102,7 +118,7 @@ if st.button('Display Random Images'):
                 predictions = model.predict(img_array)
                 predicted_class_index = np.argmax(predictions)
                 predicted_class_label = class_labels[predicted_class_index]
-                ax.set_title(predicted_class_label)
+                ax.set_title(predicted_class_label, fontsize=8)
 
         st.pyplot(fig)
     else:
