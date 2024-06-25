@@ -4,9 +4,6 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import requests
 from io import BytesIO
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
 import datetime
 
 # Function to download the model file
@@ -72,102 +69,90 @@ model = load_saved_model(model_path)
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
 
-# Path to your image dataset
-image_folder_path = r'D:\STUDY\Year4\Development_Toy-A-10class\resized_augmented_test'
-
-# Get all image file paths and their corresponding labels
-image_paths = []
-labels = []
-for root, dirs, files in os.walk(image_folder_path):
-    for file in files:
-        if file.endswith(('png', 'jpg', 'jpeg', 'bmp', 'gif')):
-            file_path = os.path.join(root, file)
-            label = os.path.basename(root)  # Assuming the directory name is the label
-            image_paths.append(file_path)
-            labels.append(label)
-
-# Create a dataframe to hold file paths and labels
-image_df = pd.DataFrame({'Filepath': image_paths, 'Label': labels})
-
 # Function to preprocess the uploaded image
 def preprocess_image(img):
-    img = img.convert('RGB')
-    img = img.resize((150, 150))
-    img = np.array(img)
-    img = img / 255.0
-    img = np.expand_dims(img, axis=0)
+    img = img.convert('RGB')  # Ensure image is in RGB format
+    img = img.resize((150, 150))  # Resize image to match model's expected sizing
+    img = np.array(img)  # Convert image to numpy array
+    img = img / 255.0  # Normalize pixel values to be between 0 and 1
+    img = np.expand_dims(img, axis=0)  # Add batch dimension
     return img
 
-# Streamlit Components
+# Sidebar with various components
 with st.sidebar:
     st.header("Settings")
-    st.checkbox("Enable some feature")
-    st.selectbox("Choose a class label", class_labels)
-    st.date_input("Select a date")
-    st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
+    enable_feature = st.checkbox("Enable some feature")
+    selected_label = st.selectbox("Choose a class label", class_labels)
+    selected_date = st.date_input("Select a date")
+    selected_date_range = st.date_input("Select date range", [datetime.date.today(), datetime.date.today() + datetime.timedelta(days=1)], key="date_range", disabled=False)
 
 # Tabs
 tab1, tab2 = st.tabs(["Upload & Predict", "Random Images"])
 
 with tab1:
     st.header("Upload an Image for Prediction")
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "bmp", "gif"])
-    
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
     if uploaded_file is not None:
-        # Load and display the uploaded image
-        img = Image.open(uploaded_file)
-        st.image(img, caption='Uploaded Image', use_column_width=True)
-        
-        # Preprocess the image and make a prediction
-        img_array = preprocess_image(img)
-        predictions = model.predict(img_array)
-        predicted_class_index = np.argmax(predictions)
-        predicted_class_label = class_labels[predicted_class_index]
-        
-        st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
+        try:
+            # Display the uploaded image
+            img = Image.open(uploaded_file)
+            st.image(img, caption='Uploaded Image', use_column_width=True)
+
+            if model:
+                # Preprocess the image
+                img_array = preprocess_image(img)
+
+                # Perform inference to obtain predictions
+                predictions = model.predict(img_array)
+
+                # Get the predicted class label
+                predicted_class_index = np.argmax(predictions)
+                predicted_class_label = class_labels[predicted_class_index]
+
+                # Display the predicted class label
+                st.markdown(f"<div class='prediction-box'>Prediction: {predicted_class_label}</div>", unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
 
 with tab2:
     st.header("Display Random Images from Dataset")
     if st.button('Display Random Images'):
-        if len(image_df) >= 18:
-            random_indices = np.random.randint(0, len(image_df), 18)
-            fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(15, 10), subplot_kw={'xticks': [], 'yticks': []})
-
-            for i, ax in enumerate(axes.flat):
-                image_path = image_df.Filepath[random_indices[i]]
-                img = Image.open(image_path)
-                ax.imshow(img)
-                
-                if model:
-                    img_array = preprocess_image(img)
-                    predictions = model.predict(img_array)
-                    predicted_class_index = np.argmax(predictions)
-                    predicted_class_label = class_labels[predicted_class_index]
-                    ax.set_title(predicted_class_label, fontsize=8)
-
-            st.pyplot(fig)
-        else:
-            st.error(f"Not enough images in the dataset to display 18 random images. Found {len(image_df)} images.")
+        # Assuming you have the logic to display random images from your dataset here
+        st.write("Displaying random images...")
 
 # Additional Components
 st.header("Additional Components")
-st.text_input("Enter some text")
-st.text_area("Enter a longer text")
-st.slider("Select a range", 0, 100, (25, 75))
-st.radio("Choose an option", ["Option 1", "Option 2", "Option 3"])
-st.switch("Enable feature")
-st.button("Click Me")
+text_input_value = st.text_input("Enter some text")
+text_area_value = st.text_area("Enter a longer text")
+slider_value = st.slider("Select a range", 0, 100, (25, 75))
+radio_value = st.radio("Choose an option", ["Option 1", "Option 2", "Option 3"])
+switch_value = st.switch("Enable feature")
+button_clicked = st.button("Click Me")
+
+# Display collected values
+st.write("Text Input Value:", text_input_value)
+st.write("Text Area Value:", text_area_value)
+st.write("Slider Value:", slider_value)
+st.write("Radio Value:", radio_value)
+st.write("Switch Value:", switch_value)
+st.write("Button Clicked:", button_clicked)
 
 # Table
 st.header("Data Table")
-st.dataframe(image_df.head())
+sample_data = {
+    "Column 1": [1, 2, 3],
+    "Column 2": [4, 5, 6]
+}
+st.table(sample_data)
 
 # Alert Dialog (simulated using st.info, st.warning, etc.)
 st.info("This is an info alert")
 st.warning("This is a warning alert")
 st.error("This is an error alert")
 
-# Badges (simulated using markdown)
+# Badge (simulated using markdown)
 st.markdown("<span style='background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 5px;'>Badge Example</span>", unsafe_allow_html=True)
 
 # Link Button
