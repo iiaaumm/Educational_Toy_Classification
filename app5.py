@@ -7,11 +7,47 @@ import pandas as pd  # Import pandas for CSV file operations
 from collections import Counter  # Import Counter for counting occurrences
 from toy_info import toy_info  
 # Page configuration
-st.set_page_config(page_title='Educational Toy Classification', page_icon='🎲', layout='wide', initial_sidebar_state='expanded')
 
-# Load the saved model
-model_path = r'D:\STUDY\Year4\Development_Toy-A-10class\saved_model\Toy_classification_MobileNet.h5'
-model = load_model(model_path)
+
+st.set_page_config(page_title='Educational Toy Classification', page_icon='🎲', layout='wide', initial_sidebar_state='expanded')
+# Function to download the model file
+def download_model_file(model_url, model_path):
+    # Download the model file from the URL
+    with requests.get(model_url, stream=True) as response:
+        response.raise_for_status()
+        with open(model_path, 'wb') as out_file:
+            for chunk in response.iter_content(chunk_size=8192):
+                out_file.write(chunk)
+
+# Function to load the model
+@st.cache(allow_output_mutation=True)
+def load_saved_model(model_path):
+    try:
+        model = load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading the model: {e}")
+        return None
+
+# Apply the custom style with Google Fonts
+st.markdown(header_style, unsafe_allow_html=True)
+
+
+# URL of the model file in your GitHub repository
+model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
+
+# Path to save the assembled model
+model_path = './Toy_classification_10class.h5'
+
+# Download the model file
+try:
+    download_model_file(model_url, model_path)
+    st.write("Model downloaded successfully.")
+except Exception as e:
+    st.error(f"Unable to download the model file: {e}")
+
+# Loading the model
+model = load_saved_model(model_path)
 
 # List of class labels
 class_labels = ['Activity_Cube', 'Ball', 'Puzzle', 'Rubik', 'Tricycle', 'baby_walker', 'lego', 'poppet', 'rattle', 'stacking']
