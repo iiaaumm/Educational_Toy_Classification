@@ -29,8 +29,7 @@ def load_saved_model(model_path):
         st.error(f"Error loading the model: {e}")
         return None
 
-# Apply the custom style with Google Fonts
-st.markdown(header_style, unsafe_allow_html=True)
+
 
 
 # URL of the model file in your GitHub repository
