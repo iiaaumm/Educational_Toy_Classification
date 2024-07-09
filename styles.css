@@ -1,0 +1,274 @@
+/* Import Google Fonts stylesheet for Noto Sans Lao Looped */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped&display=swap');
+
+
+
+
+/* General Body Styling */
+body {
+    font-family: 'Noto Sans Lao Looped', sans-serif;
+    background-color: #ffffff; /* Set background color to white */
+    color: #333;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+.ranking-table, .history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.ranking-table th, .ranking-table td, .history-table th, .history-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.ranking-table th, .history-table th {
+    background-color: #f4f4f4;
+}
+.ranking-table tr:nth-child(even), .history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.tables-container {
+    display: flex;
+    gap: 20px;
+}
+
+/* Header Styling */
+.header-text {
+    font-family: 'Noto Sans Lao Looped', sans-serif;
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #4389d4; /* Add background color to header */
+    padding: 20px; /* Add padding */
+    border-radius: 10px; /* Rounded corners */
+    text-align: center; /* Center align text */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    margin-bottom: 30px; /* Increased margin */
+}
+
+/* Header Styling */
+.sub-header {
+    font-family: 'Noto Sans Lao Looped', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    padding: 5px; /* Add padding */
+    text-align: lef; /* Center align text */
+
+}
+
+/* Prediction Text Styling */
+.prediction-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3e84cf; /* Highlight color for the predicted class */
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 2px solid #3e84cf; /* Border around text */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #e7f0ff; /* Light background color */
+    text-align: center; /* Center align text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+
+
+/* styles.css */
+
+/* Style for the description text */
+.description-text {
+    font-family: 'Noto Sans Lao Looped', sans-serif;
+    list-style-type: disc;
+    text-align: justify;
+    font-size: 20px;
+    color: #555555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    border-left: 4px solid #4CAF50;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 900px; /* Maximum width for larger screens */
+    margin: 0px; /* Center align */
+    min-height: 250px;
+    border: 2px solid #1c1c1c;
+    position: relative;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+    .description-text {
+        font-size: 18px; /* Slightly smaller font size */
+        padding-left: 0px; /* Adjust padding */
+        padding-right: 15px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        min-height: 200px; /* Adjust minimum height */
+    }
+}
+/* Style for the list */
+.description-text ul {
+    list-style-type: disc;
+    font-size: 20px;
+    padding-left: 0px;
+}
+
+.description-text ul li {
+    font-size: 20px;
+    margin-bottom: 10px;
+
+}
+
+
+
+/* Add CSS rules for the webcam capture section */
+.sidebar .webcam-capture {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Upload Button Styling */
+.sidebar .file-uploader button {
+    background-color: #4CAF50; /* Green background */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .file-uploader button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Button Styles */
+.button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 2px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #45a049;
+}
+
+/* Info Boxes */
+.info-box {
+    font-family: 'Noto Sans Lao Looped', sans-serif;
+    background-color: #E3F2FD;
+    color: #0D47A1;
+    border-left: 5px solid #0D47A1;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+/* Top 3 Ranking */
+.ranking {
+    font-size: 20px;
+    color: #FF9800;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #FFF3E0;
+    border-radius: 8px; /* Rounded corners */
+    border: 2px solid #FF9800; /* Border around ranking section */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    text-align: center; /* Center align text */
+}
+
+/* Ranking Item */
+.ranking-item {
+    margin-bottom: 10px;
+}
+
+/* Prediction History Table */
+.prediction-history-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.prediction-history-table th, .prediction-history-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.prediction-history-table th {
+    background-color: #2196F3;
+    color: white;
+}
+
+/* Card Style */
+.card {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 20px;
+    color: #333333;
+    margin-bottom: 10px;
+}
+
+.card-content {
+    font-size: 16px;
+    color: #666666;
+}
+
+/* Loading Spinner */
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+}
+
+.spinner div {
+    width: 12px;
+    height: 12px;
+    margin: 0 4px;
+    border-radius: 50%;
+    background-color: #007bff;
+    animation: spinner 0.8s infinite alternate;
+}
+
+@keyframes spinner {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-12px);
+    }
+}
+
