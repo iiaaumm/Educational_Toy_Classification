@@ -7,7 +7,8 @@ import pandas as pd  # Import pandas for CSV file operations
 from collections import Counter  # Import Counter for counting occurrences
 from toy_info import toy_info  
 # Page configuration
-
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
 
 st.set_page_config(page_title='Educational Toy Classification', page_icon='🎲', layout='wide', initial_sidebar_state='expanded')
 # Function to download the model file
@@ -32,6 +33,13 @@ def load_saved_model(model_path):
 
 
 
+
+
+model = Sequential([
+    # Add other layers
+    Flatten(input_shape=(4, 4, 512)),  # Make sure input_shape is specified correctly
+    Dense(10, activation='softmax')  # Example dense layer
+])
 # URL of the model file in your GitHub repository
 model_url = 'https://github.com/iiaaumm/Educational_Toy_Classification/raw/main/Toy_classification_10class.h5'
 
